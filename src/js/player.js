@@ -1299,7 +1299,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
 
   onActivity = vjs.bind(this, this.reportUserActivity);
 
-  onMouseActivity = function(e) {
+  onMouseMove = function(e) {
     // Prevent mousemove spamming
     if(e.screenX != lastMoveX || e.screenY != lastMoveY) {
       lastMoveX = e.screenX;
@@ -1321,14 +1321,14 @@ vjs.Player.prototype.listenForUserActivity = function(){
   };
 
   onMouseUp = function(event) {
-    onMouseActivity();
+    onActivity();
     // Stop the interval that maintains activity if the mouse/touch is down
     clearInterval(mouseInProgress);
   };
 
   // Any mouse movement will be considered user activity
   this.on('mousedown', onMouseDown);
-  this.on('mousemove', onMouseActivity);
+  this.on('mousemove', onMouseMove);
   this.on('mouseup', onMouseUp);
 
   // Listen for keyboard navigation
