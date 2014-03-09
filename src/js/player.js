@@ -1294,13 +1294,22 @@ vjs.Player.prototype.userActive = function(bool){
 };
 
 vjs.Player.prototype.listenForUserActivity = function(){
-  var onMouseActivity, onMouseDown, mouseInProgress, onMouseUp,
-      activityCheck, inactivityTimeout;
+  var onActivity, onMouseActivity, onMouseDown, mouseInProgress, onMouseUp,
+      activityCheck, inactivityTimeout, lastMoveX, lastMoveY;
 
-  onMouseActivity = vjs.bind(this, this.reportUserActivity);
+  onActivity = vjs.bind(this, this.reportUserActivity);
+
+  onMouseActivity = function(e) {
+    // Prevent mousemove spamming
+    if(e.screenX != lastMoveX || e.screenY != lastMoveY) {
+      lastMoveX = e.screenX;
+      lastMoveY = e.screenY;
+      onActivity();
+    }
+  }
 
   onMouseDown = function() {
-    onMouseActivity();
+    onActivity();
     // For as long as the they are touching the device or have their mouse down,
     // we consider them active even if they're not moving their finger or mouse.
     // So we want to continue to update that they are active
@@ -1324,8 +1333,8 @@ vjs.Player.prototype.listenForUserActivity = function(){
 
   // Listen for keyboard navigation
   // Shouldn't need to use inProgress interval because of key repeat
-  this.on('keydown', onMouseActivity);
-  this.on('keyup', onMouseActivity);
+  this.on('keydown', onActivity);
+  this.on('keyup', onActivity);
 
   // Run an interval every 250 milliseconds instead of stuffing everything into
   // the mousemove/touchmove function itself, to prevent performance degradation.
